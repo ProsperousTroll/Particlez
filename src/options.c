@@ -7,7 +7,7 @@
 #include <raylib.h>
 
 void initOptions(Options* op){
-	op->toolType = SPAWN;
+	op->toolType = GRAB;
 	op->winWidth = 1280;
 	op->winHeight = 720;
 	op->fps = GetMonitorRefreshRate(0);

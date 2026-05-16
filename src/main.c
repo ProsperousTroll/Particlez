@@ -30,11 +30,22 @@ void init(){
 	initSystem(&pSystem, 1, &options);
 }
 void update(float dt){
+	Vector2 mousePos = {0.f, 0.f};
+	Vector2 winPos = {0.f, 0.f};
+	mousePos = GetMousePosition();
+	winPos = GetWindowPosition();
 	options.winWidth = GetRenderWidth();
 	options.winHeight = GetRenderHeight();
 	
 	options.ballSize -= (int)GetMouseWheelMove()*dt*options.ballScaleSpd;
 	options.ballSize = Clamp(options.ballSize, options.ballMin, options.ballMax);
+
+	// bypass windows freezing the window when being moved by just moving it myself
+#ifdef _WIN32
+	if(IsMouseButtonDown(1)){
+		SetWindowPosition(winPos.x + mousePos.x - (float)options.winWidth/2, winPos.y + mousePos.y - (float)options.winHeight/2);
+	}
+#endif
 
 	if(IsKeyPressed(KEY_F3) && !DEBUG){
 		DEBUG = true;
