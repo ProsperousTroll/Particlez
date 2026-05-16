@@ -1,0 +1,5 @@
+-- run 'zmake --pdo-help' for a quick guide.
+set project{"rl-particles"}
+set lang{"c"}
+set libs{"raylib"}
+set flags{"Wall", "O2", "std=c23"}
