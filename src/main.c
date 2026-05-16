@@ -1,4 +1,6 @@
 #include <raylib.h>
+#include <raymath.h>
+#include "../inc/menu.h"
 #include "../inc/options.h"
 #include "../inc/helper.h"
 #include "../inc/particles.h"
@@ -6,52 +8,62 @@
 #define WIN_NAME "Particlez"
 
 Options options = {0};
-
+Menu menu = {0};
 ParticleSystem pSystem = {0};
+Particle* held = NULL;
 bool DEBUG = false;
 
 int run(int w, int h, char* name, int fps);
 void init();
 void update(float dt);
 void draw();
+void unload();
 
 int main(){
-	return run(WIN_WIDTH, WIN_HEIGHT, WIN_NAME, WIN_FPS);
+	return run(WIN_WIDTH, WIN_HEIGHT, WIN_NAME, options.fps);
 }
 
 void init(){
 	initOptions(&options);
+	initMenu(&menu, 0, 0, &options);
 
 	initSystem(&pSystem, 1, &options);
 }
 void update(float dt){
-	Vector2 mousePos = {0.f, 0.f};
-	Vector2 winPos = {0.f, 0.f};
-	mousePos = GetMousePosition();
-	winPos = GetWindowPosition();
 	options.winWidth = GetRenderWidth();
 	options.winHeight = GetRenderHeight();
 	
-	if(IsKeyDown(KEY_UP)) options.ballSize+=dt*5.f;
-	if(IsKeyDown(KEY_DOWN)) options.ballSize-=dt*5.f;
-
-	if(IsMouseButtonDown(1)){
-		SetWindowPosition(winPos.x + mousePos.x - (float)WIN_WIDTH/2, winPos.y + mousePos.y - (float)WIN_HEIGHT/2);
-	}
+	options.ballSize -= (int)GetMouseWheelMove()*dt*options.ballScaleSpd;
+	options.ballSize = Clamp(options.ballSize, options.ballMin, options.ballMax);
 
 	if(IsKeyPressed(KEY_F3) && !DEBUG){
 		DEBUG = true;
 	} else if(IsKeyPressed(KEY_F3)) DEBUG = false;
+	updateMenu(&menu, dt);
 
 	updateSystem(&pSystem, dt, &options);
 }
+
 void draw(){
 	ClearBackground(BLACK);
 	drawSystem(&pSystem);
+	switch(options.toolType){
+		case SPAWN:
+			DrawCircle((int)GetMousePosition().x-(int)options.ballSize/8, (int)GetMousePosition().y-(int)options.ballSize/8, options.ballSize, ColorAlpha(WHITE, 0.5f));
+			break;
+		case GRAB:
+			break;
+	}
+	drawMenu(&menu);
 	if(DEBUG) { 
 		DrawFPS(10, 10); 
-		DrawText(TextFormat("Balls: [%d], Ball Size: [%f]", pSystem.size, options.ballSize), 100, 10, 19, WHITE);
+		DrawText(TextFormat("Balls: [%d], Ball Size: [%f]", pSystem.size, options.ballSize), 100, 10, 19, GREEN);
 	}
+}
+
+void unload(){
+	free(pSystem.particles);
+	unloadOptions(&options);
 }
 
 int run(int w, int h, char* name, int fps){
@@ -65,7 +77,7 @@ int run(int w, int h, char* name, int fps){
 		draw();
 		EndDrawing();
 	}
+	unload();
 	CloseWindow();
-	free(pSystem.particles);
 	return 0;
 }

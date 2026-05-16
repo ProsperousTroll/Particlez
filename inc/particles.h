@@ -19,7 +19,7 @@ typedef struct {
 } Particle;
 
 // Particle methods
-Particle newParticle(float x, float y, float rad, Color color);
+Particle newParticle(float x, float y, float rad, Color color, Options* op);
 void drawParticle(Particle* p);
 void updateParticle(Particle* p, float dt, Options* op);
 
@@ -27,6 +27,7 @@ void updateParticle(Particle* p, float dt, Options* op);
 typedef struct {
 	bool emplacing;
 	Particle* particles;
+	Particle* held;
 	size_t size, cap;
 } ParticleSystem;
 

@@ -1,5 +1,6 @@
 #include "../inc/helper.h"
-#include "../inc/icon.h"
+#include "../inc/assets/icon.h"
+#include <raylib.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -31,4 +32,14 @@ void loadIcon(){
 	Image icon = LoadImageFromMemory(".png", icon_png, icon_png_len);
 	SetWindowIcon(icon);
 	UnloadImage(icon);
+}
+
+void switchTool(Options *op, ToolType tool){
+	op->toolType = tool;
+}
+
+void loadTexture(Texture2D* texture, const char* fileType, const unsigned char* fileData, int dataSize){
+	Image img = LoadImageFromMemory(fileType, fileData, dataSize);
+	*texture = LoadTextureFromImage(img);
+	UnloadImage(img);
 }

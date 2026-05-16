@@ -8,23 +8,23 @@
 #include "../inc/helper.h"
 
 // Particle
-Particle newParticle(float x, float y, float rad, Color color){
+Particle newParticle(float x, float y, float rad, Color color, Options* op){
 	Particle p;
 	p.vel = (Vector2){0.f, 0.f};
 	p.radius = rad;
 	p.color = color;
 
 	// make sure particles spawn outside the win/width
-	if(x+rad > WIN_WIDTH){
-		p.pos.x = WIN_WIDTH-rad;
+	if(x+rad > op->winWidth){
+		p.pos.x = op->winWidth-rad;
 	} else if (x-rad < 0){
 		p.pos.x = rad;
 	} else {
 		p.pos.x = x;
 	}
 
-	if(y+rad > WIN_HEIGHT){
-		p.pos.y = WIN_HEIGHT-rad;
+	if(y+rad > op->winHeight){
+		p.pos.y = op->winHeight-rad;
 	} else if (y-rad < 0){
 		p.pos.y = rad;
 	} else {
@@ -71,13 +71,14 @@ void updateParticle(Particle *p, float dt, Options* op){
 
 // ParticleSystem
 void initSystem(ParticleSystem* ps, size_t initCount, Options* op){
+	ps->held = NULL;
 	ps->emplacing = false;
 	ps->cap = initCount*2;
 	ps->size = initCount;
 	ps->particles = (Particle*) malloc(initCount*sizeof(Particle));
 
 	for(size_t i = 0; i < initCount; i++){
-		ps->particles[i] = newParticle(getRandom(0.f, op->winWidth), getRandom(0.f, op->winWidth), getRandom(5.f, 15.f), randomColor());
+		ps->particles[i] = newParticle(getRandom(0.f, op->winWidth), getRandom(0.f, op->winWidth), getRandom(5.f, 15.f), randomColor(), op);
 		ps->particles[i].vel.x = getRandom(-1000.f, 1000.f);
 		ps->particles[i].vel.y = getRandom(-1000.f, 1000.f);
 	}
@@ -87,9 +88,8 @@ void initSystem(ParticleSystem* ps, size_t initCount, Options* op){
 void emplaceParticles(ParticleSystem *ps, size_t inc, Options* op){
 	ps->emplacing = true;
 	size_t newSize = ps->size+inc;
-	//float newRad = getRandom(5.f, 15.f);
-	Vector2 mousePos = {0.f, 0.f};
-	mousePos = GetMousePosition();
+	//Vector2 mousePos = {0.f, 0.f};
+	//mousePos = GetMousePosition();
 	for(size_t i = ps->size; i < newSize; ++i){
 		if(newSize >= ps->cap){
 			size_t newCap = ps->cap*2;
@@ -101,8 +101,7 @@ void emplaceParticles(ParticleSystem *ps, size_t inc, Options* op){
 			ps->particles = new;
 			ps->cap = newCap;
 		} 
-		ps->particles[ps->size] = newParticle(mousePos.x, mousePos.y, op->ballSize, randomColor());
-		ps->size++;
+		ps->particles[ps->size++] = newParticle(GetMousePosition().x, GetMousePosition().y, op->ballSize, randomColor(), op);
 	}
 	ps->emplacing = false;
 }
@@ -172,16 +171,39 @@ void collideParticles(ParticleSystem* ps, float dt){
 }
 
 void updateSystem(ParticleSystem *ps, float dt, Options* op){
-	if(IsMouseButtonDown(0)){
-		emplaceParticles(ps, 1, op);
-	}
-	if(IsMouseButtonDown(2) || IsKeyDown(KEY_BACKSPACE)){
-		removeParticle(ps, ps->size-1);
-	}
 	int size = ps->size;
 	Vector2 winPos = GetWindowPosition();
 	static Vector2 lastPosition;
 	Vector2 winDelta = Vector2Subtract(winPos, lastPosition);
+
+	if(IsMouseButtonDown(0) && !op->selecting){
+		switch(op->toolType){
+			case SPAWN:
+				emplaceParticles(ps, 1, op);
+				break;
+			case GRAB:
+				if(ps->held == NULL){
+					for(int i = 0; i < size; ++i){
+						if(CheckCollisionPointCircle(GetMousePosition(), ps->particles[i].pos, ps->particles[i].radius)){
+							ps->held = &ps->particles[i];
+						}
+					}		
+				} else if(ps->held){
+					ps->held->pos.x = GetMousePosition().x - ps->held->radius/8;
+					ps->held->pos.y = GetMousePosition().y - ps->held->radius/8;
+					ps->held->vel.x = GetMouseDelta().x*100.f;
+					ps->held->vel.y = GetMouseDelta().y*100.f;              				
+				}
+				break;
+		}
+	} else {
+		if(ps->held != NULL){
+			ps->held = NULL;
+		}
+	}
+	if(IsMouseButtonDown(2) || IsKeyDown(KEY_BACKSPACE)){
+		removeParticle(ps, ps->size-1);
+	}
 
 	collideParticles(ps, dt);
 	for(int i = 0; i < size; ++i){
