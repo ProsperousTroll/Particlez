@@ -2,8 +2,6 @@
 set project{"Particlez"}
 set lang{"c"}
 set comp{"gcc"}
-set lib{"libs"}
 
--- "mwindows" disables the terminal from opening with the game window
-set flags{"static", "mwindows"}
-set libs{"raylib", "opengl32", "gdi32", "winmm"}
+set flags{"Wall", "O2"}
+set libs{"raylib"}

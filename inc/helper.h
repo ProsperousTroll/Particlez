@@ -1,5 +1,5 @@
 #pragma once
-#include "raylib.h"
+#include <raylib.h>
 
 void loadIcon();
 float getRandom(float min, float max);

@@ -1,8 +1,6 @@
-#include <stdio.h>
-#include <time.h>
+#include <raylib.h>
 #include "../inc/helper.h"
 #include "../inc/particles.h"
-#include "../inc/raylib.h"
 
 ParticleSystem pSystem = {0};
 bool DEBUG = false;
