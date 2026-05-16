@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <time.h>
+#include "../inc/helper.h"
 #include "../inc/particles.h"
 #include "../inc/raylib.h"
 
-ParticleSystem pSystem;
+ParticleSystem pSystem = {0};
 bool DEBUG = false;
 
 int run(int w, int h, char* name, int fps);
@@ -16,15 +17,13 @@ int main(){
 }
 
 void init(){
-	SetConfigFlags(FLAG_WINDOW_ALWAYS_RUN | FLAG_WINDOW_RESIZABLE);
-	SetWindowMonitor(0);
+	SetConfigFlags(FLAG_WINDOW_ALWAYS_RUN);
+	//SetWindowMonitor(0);
 
-	pSystem = initSystem(200);
+	initSystem(&pSystem, 1);
 }
 void update(float dt){
 	Vector2 mousePos = GetMousePosition();
-	updateSystem(&pSystem, dt);
-
 	if(IsMouseButtonDown(1)){
 		SetWindowPosition(GetWindowPosition().x + mousePos.x - (float)WIN_WIDTH/2, GetWindowPosition().y + mousePos.y - (float)WIN_HEIGHT/2);
 	}
@@ -32,6 +31,8 @@ void update(float dt){
 	if(IsKeyPressed(KEY_F3) && !DEBUG){
 		DEBUG = true;
 	} else if(IsKeyPressed(KEY_F3)) DEBUG = false;
+
+	updateSystem(&pSystem, dt);
 }
 void draw(){
 	ClearBackground(BLACK);
@@ -44,6 +45,7 @@ void draw(){
 int run(int w, int h, char* name, int fps){
 	init();
 	InitWindow(w, h, name);
+	loadIcon();
 	SetTargetFPS(fps);
 	while(!WindowShouldClose()){
 		update(GetFrameTime());

@@ -24,13 +24,15 @@ void updateParticle(Particle* p, float dt);
 
 // ParticleSystem
 typedef struct {
+	bool emplacing;
 	Particle* particles;
 	size_t size, cap;
 } ParticleSystem;
 
 // ParticleSystem methods
-ParticleSystem initSystem(size_t initCount);
+void initSystem(ParticleSystem* ps, size_t initCount);
 void drawSystem(ParticleSystem* ps);
 void updateSystem(ParticleSystem* ps, float dt);
 void emplaceParticles(ParticleSystem* ps, size_t inc);
+void removeParticle(ParticleSystem* ps, size_t index);
 void collideParticles(ParticleSystem* ps);

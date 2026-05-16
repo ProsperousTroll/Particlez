@@ -1,3 +1,4 @@
+#include <crtdbg.h>
 #include <raylib.h>
 #include <raymath.h>
 #include <time.h>
@@ -9,6 +10,7 @@
 // Particle
 Particle newParticle(float x, float y, float rad, Color color){
 	Particle p;
+	p.vel = (Vector2){0.f, 0.f};
 	p.radius = rad;
 	p.color = color;
 
@@ -68,33 +70,55 @@ void updateParticle(Particle *p, float dt){
 }
 
 // ParticleSystem
-ParticleSystem initSystem(size_t initCount){
-	ParticleSystem ps;
-	ps.cap = initCount*2;
-	ps.size = initCount;
-	ps.particles = (Particle*) malloc(initCount*sizeof(Particle));
+void initSystem(ParticleSystem* ps, size_t initCount){
+	ps->emplacing = false;
+	ps->cap = initCount*2;
+	ps->size = initCount;
+	ps->particles = (Particle*) malloc(initCount*sizeof(Particle));
 
-	for(size_t i = 0; i < initCount; ++i){
-		ps.particles[i] = newParticle(getRandom(0.f, WIN_WIDTH), getRandom(0.f, WIN_HEIGHT), getRandom(5.f, 15.f), WHITE);
-		ps.particles[i].vel.x = getRandom(-1000.0f, 1000.0f);
-		ps.particles[i].vel.y = getRandom(-1000.0f, 1000.0f);
+	for(size_t i = 0; i < initCount; i++){
+		ps->particles[i] = newParticle(getRandom(0.f, WIN_WIDTH), getRandom(0.f, WIN_HEIGHT), getRandom(5.f, 15.f), WHITE);
+		ps->particles[i].vel.x = getRandom(-1000.f, 1000.f);
+		ps->particles[i].vel.y = getRandom(-1000.f, 1000.f);
 	}
-	return ps;
 }
 
 // methods
 void emplaceParticles(ParticleSystem *ps, size_t inc){
-	if(ps->size+inc >= ps->cap){
-		ps->cap*=2;
-		ps->particles = realloc(ps->particles, ps->size+inc+sizeof(Particle));
+	ps->emplacing = true;
+	size_t newSize = ps->size+inc;
+	float newRad = getRandom(5.f, 15.f);
+	Vector2 mousePos = {0.f, 0.f};
+	mousePos = GetMousePosition();
+	printf("EMPLACING: PARTICLES SIZE: %zu\n", ps->size);
+	for(size_t i = ps->size; i < newSize; ++i){
+		if(newSize >= ps->cap){
+			size_t newCap = ps->cap*2;
+			Particle* new = (Particle*)realloc(ps->particles, newCap*sizeof(Particle));
+			if(!new){
+				printf("HORRIBLE- CANT REALLOC!\n");
+				exit(1);
+			}
+			ps->particles = new;
+			ps->cap = newCap;
+		} 
+		ps->particles[ps->size] = newParticle(mousePos.x, mousePos.y, newRad, randomColor());
+		ps->size++;
 	}
-	for(size_t i = ps->size; i < ps->size+inc; ++i){
-		ps->particles[++ps->size] = newParticle(getRandom(0.f, WIN_WIDTH), getRandom(0.f, WIN_HEIGHT), getRandom(5.f, 15.f), WHITE);
-	}
+	ps->emplacing = false;
+}
+
+void removeParticle(ParticleSystem *ps, size_t index){
+ 	if(index >= ps->size ) return;
+	ps->particles[index] = ps->particles[ps->size - 1];
+	ps->size--;
 }
 
 void drawSystem(ParticleSystem* ps){
-	for(int i = 0; i < ps->size; ++i){
+	int size = ps->size;
+	if(ps->emplacing) return;
+	for(int i = 0; i < size; ++i){
+		if(ps->emplacing) continue;
 		drawParticle(&ps->particles[i]);
 	}
 }
@@ -149,11 +173,20 @@ void collideParticles(ParticleSystem* ps){
 }
 
 void updateSystem(ParticleSystem *ps, float dt){
+	if(IsMouseButtonDown(0)){
+		emplaceParticles(ps, 1);
+	}
+	if(IsMouseButtonDown(2) || IsKeyDown(KEY_BACKSPACE)){
+		removeParticle(ps, ps->size-1);
+	}
+	int size = ps->size;
 	Vector2 winPos = GetWindowPosition();
 	static Vector2 lastPosition;
 	Vector2 winDelta = Vector2Subtract(winPos, lastPosition);
+
 	collideParticles(ps);
-	for(int i = 0; i < ps->size; ++i){
+	for(int i = 0; i < size; ++i){
+		if(ps->emplacing) continue;
 		updateParticle(&ps->particles[i], dt);
 
 		if(winDelta.x) ps->particles[i].vel.x += winDelta.x*2;

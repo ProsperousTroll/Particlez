@@ -1,5 +1,5 @@
 -- run 'zmake --pdo-help' for a quick guide.
-set project{"rl-particles"}
+set project{"Particlez"}
 set lang{"c"}
 set comp{"gcc"}
 set lib{"libs"}
