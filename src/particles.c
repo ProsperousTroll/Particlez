@@ -77,7 +77,7 @@ void initSystem(ParticleSystem* ps, size_t initCount){
 	ps->particles = (Particle*) malloc(initCount*sizeof(Particle));
 
 	for(size_t i = 0; i < initCount; i++){
-		ps->particles[i] = newParticle(getRandom(0.f, WIN_WIDTH), getRandom(0.f, WIN_HEIGHT), getRandom(5.f, 15.f), WHITE);
+		ps->particles[i] = newParticle(getRandom(0.f, WIN_WIDTH), getRandom(0.f, WIN_HEIGHT), getRandom(5.f, 15.f), randomColor());
 		ps->particles[i].vel.x = getRandom(-1000.f, 1000.f);
 		ps->particles[i].vel.y = getRandom(-1000.f, 1000.f);
 	}
@@ -124,7 +124,7 @@ void drawSystem(ParticleSystem* ps){
 }
 
 
-void collideParticles(ParticleSystem* ps){
+void collideParticles(ParticleSystem* ps, float dt){
 	for(int i=0; i < ps->size; i++){
 		for(int j=i+1; j < ps->size; j++){
 			Particle* a = &ps->particles[i];
@@ -154,7 +154,7 @@ void collideParticles(ParticleSystem* ps){
 				if(speed > 0.f) continue;
 
 				float e = 0.78f;
-				float k = -(1.f + e) * speed / 2.f;
+				float k = ( -(1.f + e) * speed / 2.f );
 
 				a->vel.x += k * nx;
 				a->vel.y += k * ny;
@@ -162,7 +162,7 @@ void collideParticles(ParticleSystem* ps){
 				b->vel.y -= k * ny;
 				
 				float overlap = rad - dist;
-				float push = overlap * 0.5f;
+				float push = overlap * 0.2f;
 				a->pos.x += nx * push;
 				a->pos.y += ny * push;
 				b->pos.x -= nx * push;
@@ -184,7 +184,7 @@ void updateSystem(ParticleSystem *ps, float dt){
 	static Vector2 lastPosition;
 	Vector2 winDelta = Vector2Subtract(winPos, lastPosition);
 
-	collideParticles(ps);
+	collideParticles(ps, dt);
 	for(int i = 0; i < size; ++i){
 		if(ps->emplacing) continue;
 		updateParticle(&ps->particles[i], dt);

@@ -23,9 +23,12 @@ void init(){
 	initSystem(&pSystem, 1);
 }
 void update(float dt){
-	Vector2 mousePos = GetMousePosition();
+	Vector2 mousePos = {0.f, 0.f};
+	Vector2 winPos = {0.f, 0.f};
+	mousePos = GetMousePosition();
+	winPos = GetWindowPosition();
 	if(IsMouseButtonDown(1)){
-		SetWindowPosition(GetWindowPosition().x + mousePos.x - (float)WIN_WIDTH/2, GetWindowPosition().y + mousePos.y - (float)WIN_HEIGHT/2);
+		SetWindowPosition(winPos.x + mousePos.x - (float)WIN_WIDTH/2, winPos.y + mousePos.y - (float)WIN_HEIGHT/2);
 	}
 
 	if(IsKeyPressed(KEY_F3) && !DEBUG){
@@ -54,5 +57,6 @@ int run(int w, int h, char* name, int fps){
 		EndDrawing();
 	}
 	CloseWindow();
+	free(pSystem.particles);
 	return 0;
 }

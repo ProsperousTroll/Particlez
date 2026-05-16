@@ -5,7 +5,7 @@
 
 #define WIN_WIDTH 1280
 #define WIN_HEIGHT 720
-#define WIN_NAME "Particles"
+#define WIN_NAME "Particlez"
 #define WIN_FPS 144
 
 // const float gravity =  981.f;
@@ -35,4 +35,4 @@ void drawSystem(ParticleSystem* ps);
 void updateSystem(ParticleSystem* ps, float dt);
 void emplaceParticles(ParticleSystem* ps, size_t inc);
 void removeParticle(ParticleSystem* ps, size_t index);
-void collideParticles(ParticleSystem* ps);
+void collideParticles(ParticleSystem* ps, float dt);
