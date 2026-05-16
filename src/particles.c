@@ -3,6 +3,7 @@
 #include <time.h>
 #include <stdio.h>
 
+#include "../inc/options.h"
 #include "../inc/particles.h"
 #include "../inc/helper.h"
 
@@ -39,7 +40,7 @@ void drawParticle(Particle *p){
 	DrawCircle(p->pos.x, p->pos.y, p->radius, p->color);
 }
 
-void updateParticle(Particle *p, float dt){
+void updateParticle(Particle *p, float dt, Options* op){
 	p->vel.y += 981.f*dt;
 
 	if(p->vel.y <= 3.0f && p->vel.y >= -3.f){
@@ -50,17 +51,17 @@ void updateParticle(Particle *p, float dt){
 		p->vel.x = 0.f;	
 	} else {p->pos.x += p->vel.x*dt;}
 
-	if(p->pos.x+p->radius > WIN_WIDTH){
-		p->pos.x = WIN_WIDTH - p->radius;
+	if(p->pos.x+p->radius > op->winWidth){
+		p->pos.x = op->winWidth - p->radius;
 		p->vel.x *= -0.78f;
 	} else if (p->pos.x - p->radius < 0){
 		p->pos.x = p->radius;
 		p->vel.x *= -0.78f;
 	}
 
-	if(p->pos.y+p->radius > WIN_HEIGHT){
+	if(p->pos.y+p->radius > op->winHeight){
 		//p->pos.y-=p->vel.y*dt;
-		p->pos.y = WIN_HEIGHT - p->radius;
+		p->pos.y = op->winHeight - p->radius;
 		p->vel.y *= -0.78f;
 	} else if (p->pos.y - p->radius < 0){
 		p->pos.y = p->radius;
@@ -69,27 +70,26 @@ void updateParticle(Particle *p, float dt){
 }
 
 // ParticleSystem
-void initSystem(ParticleSystem* ps, size_t initCount){
+void initSystem(ParticleSystem* ps, size_t initCount, Options* op){
 	ps->emplacing = false;
 	ps->cap = initCount*2;
 	ps->size = initCount;
 	ps->particles = (Particle*) malloc(initCount*sizeof(Particle));
 
 	for(size_t i = 0; i < initCount; i++){
-		ps->particles[i] = newParticle(getRandom(0.f, WIN_WIDTH), getRandom(0.f, WIN_HEIGHT), getRandom(5.f, 15.f), randomColor());
+		ps->particles[i] = newParticle(getRandom(0.f, op->winWidth), getRandom(0.f, op->winWidth), getRandom(5.f, 15.f), randomColor());
 		ps->particles[i].vel.x = getRandom(-1000.f, 1000.f);
 		ps->particles[i].vel.y = getRandom(-1000.f, 1000.f);
 	}
 }
 
 // methods
-void emplaceParticles(ParticleSystem *ps, size_t inc){
+void emplaceParticles(ParticleSystem *ps, size_t inc, Options* op){
 	ps->emplacing = true;
 	size_t newSize = ps->size+inc;
-	float newRad = getRandom(5.f, 15.f);
+	//float newRad = getRandom(5.f, 15.f);
 	Vector2 mousePos = {0.f, 0.f};
 	mousePos = GetMousePosition();
-	printf("EMPLACING: PARTICLES SIZE: %zu\n", ps->size);
 	for(size_t i = ps->size; i < newSize; ++i){
 		if(newSize >= ps->cap){
 			size_t newCap = ps->cap*2;
@@ -101,7 +101,7 @@ void emplaceParticles(ParticleSystem *ps, size_t inc){
 			ps->particles = new;
 			ps->cap = newCap;
 		} 
-		ps->particles[ps->size] = newParticle(mousePos.x, mousePos.y, newRad, randomColor());
+		ps->particles[ps->size] = newParticle(mousePos.x, mousePos.y, op->ballSize, randomColor());
 		ps->size++;
 	}
 	ps->emplacing = false;
@@ -171,9 +171,9 @@ void collideParticles(ParticleSystem* ps, float dt){
 	}
 }
 
-void updateSystem(ParticleSystem *ps, float dt){
+void updateSystem(ParticleSystem *ps, float dt, Options* op){
 	if(IsMouseButtonDown(0)){
-		emplaceParticles(ps, 1);
+		emplaceParticles(ps, 1, op);
 	}
 	if(IsMouseButtonDown(2) || IsKeyDown(KEY_BACKSPACE)){
 		removeParticle(ps, ps->size-1);
@@ -186,7 +186,7 @@ void updateSystem(ParticleSystem *ps, float dt){
 	collideParticles(ps, dt);
 	for(int i = 0; i < size; ++i){
 		if(ps->emplacing) continue;
-		updateParticle(&ps->particles[i], dt);
+		updateParticle(&ps->particles[i], dt, op);
 
 		if(winDelta.x) ps->particles[i].vel.x += winDelta.x*2;
 		if(winDelta.y) ps->particles[i].vel.y += winDelta.y*2;

@@ -3,9 +3,10 @@
 #include <raylib.h>
 #include <raymath.h>
 
+#include "../inc/options.h"
+
 #define WIN_WIDTH 1280
 #define WIN_HEIGHT 720
-#define WIN_NAME "Particlez"
 #define WIN_FPS 144
 
 // const float gravity =  981.f;
@@ -20,7 +21,7 @@ typedef struct {
 // Particle methods
 Particle newParticle(float x, float y, float rad, Color color);
 void drawParticle(Particle* p);
-void updateParticle(Particle* p, float dt);
+void updateParticle(Particle* p, float dt, Options* op);
 
 // ParticleSystem
 typedef struct {
@@ -30,9 +31,9 @@ typedef struct {
 } ParticleSystem;
 
 // ParticleSystem methods
-void initSystem(ParticleSystem* ps, size_t initCount);
+void initSystem(ParticleSystem* ps, size_t initCount, Options* op);
 void drawSystem(ParticleSystem* ps);
-void updateSystem(ParticleSystem* ps, float dt);
-void emplaceParticles(ParticleSystem* ps, size_t inc);
+void updateSystem(ParticleSystem* ps, float dt, Options* op);
+void emplaceParticles(ParticleSystem* ps, size_t inc, Options* op);
 void removeParticle(ParticleSystem* ps, size_t index);
 void collideParticles(ParticleSystem* ps, float dt);

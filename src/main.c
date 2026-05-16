@@ -1,6 +1,11 @@
 #include <raylib.h>
+#include "../inc/options.h"
 #include "../inc/helper.h"
 #include "../inc/particles.h"
+
+#define WIN_NAME "Particlez"
+
+Options options = {0};
 
 ParticleSystem pSystem = {0};
 bool DEBUG = false;
@@ -15,16 +20,21 @@ int main(){
 }
 
 void init(){
-	SetConfigFlags(FLAG_WINDOW_ALWAYS_RUN);
-	//SetWindowMonitor(0);
+	initOptions(&options);
 
-	initSystem(&pSystem, 1);
+	initSystem(&pSystem, 1, &options);
 }
 void update(float dt){
 	Vector2 mousePos = {0.f, 0.f};
 	Vector2 winPos = {0.f, 0.f};
 	mousePos = GetMousePosition();
 	winPos = GetWindowPosition();
+	options.winWidth = GetRenderWidth();
+	options.winHeight = GetRenderHeight();
+	
+	if(IsKeyDown(KEY_UP)) options.ballSize+=dt*5.f;
+	if(IsKeyDown(KEY_DOWN)) options.ballSize-=dt*5.f;
+
 	if(IsMouseButtonDown(1)){
 		SetWindowPosition(winPos.x + mousePos.x - (float)WIN_WIDTH/2, winPos.y + mousePos.y - (float)WIN_HEIGHT/2);
 	}
@@ -33,21 +43,22 @@ void update(float dt){
 		DEBUG = true;
 	} else if(IsKeyPressed(KEY_F3)) DEBUG = false;
 
-	updateSystem(&pSystem, dt);
+	updateSystem(&pSystem, dt, &options);
 }
 void draw(){
 	ClearBackground(BLACK);
 	drawSystem(&pSystem);
 	if(DEBUG) { 
 		DrawFPS(10, 10); 
+		DrawText(TextFormat("Balls: [%d], Ball Size: [%f]", pSystem.size, options.ballSize), 100, 10, 19, WHITE);
 	}
 }
 
 int run(int w, int h, char* name, int fps){
-	init();
+	SetConfigFlags(FLAG_WINDOW_ALWAYS_RUN | FLAG_WINDOW_RESIZABLE);
 	InitWindow(w, h, name);
+	init();
 	loadIcon();
-	SetTargetFPS(fps);
 	while(!WindowShouldClose()){
 		update(GetFrameTime());
 		BeginDrawing();
