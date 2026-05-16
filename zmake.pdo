@@ -1,5 +1,9 @@
 -- run 'zmake --pdo-help' for a quick guide.
 set project{"rl-particles"}
 set lang{"c"}
-set libs{"raylib"}
-set flags{"Wall", "O2", "std=c23"}
+set comp{"gcc"}
+set lib{"libs"}
+
+-- "mwindows" disables the terminal from opening with the game window
+set flags{"static", "mwindows"}
+set libs{"raylib", "opengl32", "gdi32", "winmm"}
