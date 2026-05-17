@@ -1,6 +1,6 @@
 #pragma once
 
-#include <raylib.h>
+#include "raylib.h"
 #include "options.h"
 
 typedef struct {
@@ -18,8 +18,8 @@ typedef struct {
 	bool visible;
 	int x, y;
 	Options* op;
-	UXelement* selected;
-	UXelement grab, spawn;
+	//UXelement* selected;
+	UXelement grab, spawn, erase;
 } Menu;
 
 // methods

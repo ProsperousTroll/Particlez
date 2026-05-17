@@ -3,11 +3,12 @@
 
 #include "../inc/assets/grab.h"
 #include "../inc/assets/ball.h"
+#include "../inc/assets/eraser.h"
 
-#include <raylib.h>
+#include "../inc/raylib.h"
 
 void initOptions(Options* op){
-	op->toolType = GRAB;
+	op->toolType = SPAWN;
 	op->winWidth = 1280;
 	op->winHeight = 720;
 	op->fps = GetMonitorRefreshRate(0);
@@ -24,9 +25,11 @@ void initOptions(Options* op){
 	// Textures
 	loadTexture(&op->grab, ".png", grab_png, grab_png_len);
 	loadTexture(&op->ball, ".png", ball_png, ball_png_len);
+	loadTexture(&op->erase, ".png", eraser_png, eraser_png_len);
 }
 
 void unloadOptions(Options *op){
 	UnloadTexture(op->grab);
 	UnloadTexture(op->ball);
+	UnloadTexture(op->erase);
 }

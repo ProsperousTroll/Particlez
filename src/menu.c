@@ -1,8 +1,9 @@
 #include "../inc/menu.h"
 #include "../inc/helper.h"
-#include <raylib.h>
-#include <raymath.h>
+#include "../inc/raylib.h"
+#include "../inc/raymath.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 // element
 void initElement(UXelement* el, Texture2D* t, int x, int y, int w, int h){
@@ -31,11 +32,12 @@ void drawElement(UXelement* el){
 // Menu
 void initMenu(Menu* menu, int x, int y, Options *op){
 	menu->op = op;
-	menu->selected = NULL;
+	//menu->selected = NULL;
 	menu->x = x; // offsets
 	menu->y = y;
-	initElement(&menu->grab, &op->grab, 150, op->winHeight-64, 128, 128);
-	initElement(&menu->spawn, &op->ball, 300, op->winHeight-64, 128, 128);
+	initElement(&menu->grab, &menu->op->grab, 0, 0, 128, 128);
+	initElement(&menu->spawn, &menu->op->ball, 0, 0, 128, 128);
+	initElement(&menu->erase, &menu->op->erase, 0, 0, 128, 128);
 }
 
 void updateMenu(Menu *menu, float dt){
@@ -46,16 +48,18 @@ void updateMenu(Menu *menu, float dt){
 	}
 
 	if(menu->visible){
-		menu->y = Lerp(menu->y, 0, dt*25.f);
+		menu->y = Lerp(menu->y, 0, 20.f*dt);
 	} else {
-		menu->y = Lerp(menu->y, -500, dt*25.f);
+		menu->y = Lerp(menu->y, -256, 20.f*dt);
 	}
-	menu->grab.bounds.x = menu->op->winWidth / 2.f - menu->grab.bounds.width / 2.f - 128;
-	menu->grab.bounds.y = menu->op->winHeight - menu->grab.bounds.height * 1.5f - menu->y;
-	menu->spawn.bounds.x = menu->op->winWidth / 2.f - menu->spawn.bounds.width / 2.f + 128;
-	menu->spawn.bounds.y = menu->op->winHeight - menu->spawn.bounds.height * 1.5f - menu->y;
+	menu->spawn.bounds.x = menu->op->winWidth / 2.f - menu->spawn.bounds.width / 2.f - 156;
+	menu->spawn.bounds.y = 64 + menu->y;
+	menu->grab.bounds.x = menu->op->winWidth / 2.f - menu->grab.bounds.width / 2.f;
+	menu->grab.bounds.y = 64 + menu->y;
+	menu->erase.bounds.x = menu->op->winWidth / 2.f - menu->erase.bounds.width / 2.f + 156;
+	menu->erase.bounds.y = 64 + menu->y;
 
-	if(isHovered(&menu->grab) || isHovered(&menu->spawn)){
+	if(isHovered(&menu->grab) || isHovered(&menu->spawn) || isHovered(&menu->erase)){
 		menu->op->selecting = true;
 	} else menu->op->selecting = false;
 
@@ -66,9 +70,14 @@ void updateMenu(Menu *menu, float dt){
 	if(isClicked(&menu->spawn)){
 		switchTool(menu->op, SPAWN);
 	}
+
+	if(isClicked(&menu->erase)){
+		switchTool(menu->op, ERASE);
+	}
 }
 
 void drawMenu(Menu *menu){
 	drawElement(&menu->grab);
 	drawElement(&menu->spawn);
+	drawElement(&menu->erase);
 }

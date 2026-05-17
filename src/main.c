@@ -1,5 +1,5 @@
-#include <raylib.h>
-#include <raymath.h>
+#include "../inc/raylib.h"
+#include "../inc/raymath.h"
 #include "../inc/menu.h"
 #include "../inc/options.h"
 #include "../inc/helper.h"
@@ -10,7 +10,6 @@
 Options options = {0};
 Menu menu = {0};
 ParticleSystem pSystem = {0};
-Particle* held = NULL;
 bool DEBUG = false;
 
 int run(int w, int h, char* name, int fps);
@@ -35,6 +34,11 @@ void update(float dt){
 	
 	options.ballSize -= (int)GetMouseWheelMove()*dt*options.ballScaleSpd;
 	options.ballSize = Clamp(options.ballSize, options.ballMin, options.ballMax);
+
+
+	if(IsKeyPressed(KEY_ONE)) switchTool(&options, GRAB);
+	if(IsKeyPressed(KEY_TWO)) switchTool(&options, SPAWN);
+	if(IsKeyPressed(KEY_THREE)) switchTool(&options, ERASE);
 
 	// bypass windows freezing the window when being moved by just moving it myself
 	#ifdef _WIN32
@@ -61,6 +65,7 @@ void draw(){
 	ClearBackground(BLACK);
 	drawSystem(&pSystem);
 	switch(options.toolType){
+		case ERASE:
 		case SPAWN:
 			DrawCircle((int)GetMousePosition().x-(int)options.ballSize/8, (int)GetMousePosition().y-(int)options.ballSize/8, options.ballSize, ColorAlpha(WHITE, 0.5f));
 			break;

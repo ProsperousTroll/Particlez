@@ -1,8 +1,9 @@
 #include "../inc/helper.h"
 #include "../inc/assets/icon.h"
-#include <raylib.h>
+#include "../inc/raylib.h"
 #include <stdlib.h>
 #include <time.h>
+#include <stdio.h>
 
 float getRandom(float min, float max){
 	static int seeded = 0;

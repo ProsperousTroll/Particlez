@@ -1,7 +1,7 @@
 #pragma once
 #include <stdlib.h>
-#include <raylib.h>
-#include <raymath.h>
+#include "raylib.h"
+#include "raymath.h"
 
 #include "../inc/options.h"
 

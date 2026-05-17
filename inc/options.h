@@ -1,14 +1,15 @@
 #pragma once
 
-#include <raylib.h>
+#include "raylib.h"
 
 typedef enum {
 	GRAB,
 	SPAWN,
+	ERASE,
 } ToolType;
 
 typedef struct {
-	Texture2D grab, ball;
+	Texture2D grab, ball, erase;
 	ToolType toolType;
 	int winWidth, winHeight, fps;
 	float ballSize;

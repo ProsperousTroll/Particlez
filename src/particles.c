@@ -1,5 +1,5 @@
-#include <raylib.h>
-#include <raymath.h>
+#include "../inc/raylib.h"
+#include "../inc/raymath.h"
 #include <time.h>
 #include <stdio.h>
 
@@ -195,14 +195,17 @@ void updateSystem(ParticleSystem *ps, float dt, Options* op){
 					ps->held->vel.y = GetMouseDelta().y*100.f;              				
 				}
 				break;
+			case ERASE:
+				for(int i = 0; i < size; ++i){
+					if(CheckCollisionCircles(GetMousePosition(), op->ballSize, ps->particles[i].pos, ps->particles[i].radius)){
+						removeParticle(ps, i);
+					}
+				}
 		}
 	} else {
 		if(ps->held != NULL){
 			ps->held = NULL;
 		}
-	}
-	if(IsMouseButtonDown(2) || IsKeyDown(KEY_BACKSPACE)){
-		removeParticle(ps, ps->size-1);
 	}
 
 	collideParticles(ps, dt);
