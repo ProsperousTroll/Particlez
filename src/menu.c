@@ -65,19 +65,19 @@ void updateMenu(Menu *menu, float dt){
 
 	if(isClicked(&menu->grab)){
 		switchTool(menu->op, GRAB);
-	} else if(IsMouseButtonReleased(0)){
+	} else if (IsMouseButtonReleased(0)){
 		menu->visible = false;
 	}
 
 	if(isClicked(&menu->spawn)){
 		switchTool(menu->op, SPAWN);
-	} else if(IsMouseButtonReleased(0)){
+	} else if (IsMouseButtonReleased(0)){
 		menu->visible = false;
 	}
 
 	if(isClicked(&menu->erase)){
 		switchTool(menu->op, ERASE);
-	} else if(IsMouseButtonReleased(0)){
+	} else if (IsMouseButtonReleased(0)){
 		menu->visible = false;
 	}
 }
