@@ -6,6 +6,7 @@ I, annoyingly to everyone else, used my own custom-built build system to work on
 terminal command you can use to build it yourself;
 
 ### Windows (PowerShell)
+WARNING!!! You may need to compile the Raylib library yourself if you are using an ARM machine- It's easy tho I believe in you.
 ```gcc ./src/*.c -I./inc -L./libs -Wall -O2 -static -mwindows -lraylib -lgdi32 -lopengl32 -lwinmm -o Particlez.exe```
 
 ### Linux (may also just work on MacOS)
