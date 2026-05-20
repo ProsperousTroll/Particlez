@@ -191,8 +191,8 @@ void updateSystem(ParticleSystem *ps, float dt, Options* op){
 				} else if(ps->held){
 					ps->held->pos.x = GetMousePosition().x - ps->held->radius/8;
 					ps->held->pos.y = GetMousePosition().y - ps->held->radius/8;
-					ps->held->vel.x = GetMouseDelta().x*1000.f*dt;
-					ps->held->vel.y = GetMouseDelta().y*1000.f*dt;              				
+					ps->held->vel.x = GetMouseDelta().x*10000.f*dt;
+					ps->held->vel.y = GetMouseDelta().y*10000.f*dt;              				
 				}
 				break;
 			case ERASE:
